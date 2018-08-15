@@ -68,6 +68,6 @@ function walk(node) {
 function handleText(textNode) {
 	console.log(textNode)
 	words.map(word => {
-			  textNode.nodeValue = textNode.nodeValue.replace(new RegExp(`${word}`, "gi"), "!@#$%");
+			  textNode.nodeValue = textNode.nodeValue.replace(new RegExp(` ${word} `, "gi"), "!@#$%");
 			  })
 }
