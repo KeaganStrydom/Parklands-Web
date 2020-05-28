@@ -12,6 +12,7 @@ try {
 window.onload = function () {
 	try {
 		document.getElementsByClassName("gsc-adBlock")[0].style.display = "none"
+		 document.getElementById("adBlock").style.display = "none"
 	} catch(err) {
 		console.log(err)
 	}

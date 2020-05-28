@@ -248,21 +248,21 @@ class ViewController: UIViewController {
 
 extension ViewController: WKUIDelegate, WKNavigationDelegate, WebViewTouchDelegate {
 	/* WebKit */
-	func goBack() {
+	@objc func goBack() {
 		webView.isUserInteractionEnabled = true
 		self.webView.goBack()
 	}
 	
-	func goForward() {
+	@objc func goForward() {
 		self.webView.goForward()
 	}
 	
-	func goHome() {
+	@objc func goHome() {
 		self.searchField.text = ""
 		self.webView.goHome()
 	}
 	
-	func reload() {
+	@objc func reload() {
 		self.webView.load(URLRequest.init(url: self.webView.url!))
 	}
 	
