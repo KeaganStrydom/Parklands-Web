@@ -328,7 +328,7 @@ extension ViewController: UITextFieldDelegate {
 		textField.textAlignment = .center
 	}
 	
-	func textFieldDidEndEditing(_ textField: UITextField, reason: UITextFieldDidEndEditingReason) {
+	func textFieldDidEndEditing(_ textField: UITextField, reason: UITextField.DidEndEditingReason) {
 		searchBar.layer.shadowOpacity = 0
 	}
 }
