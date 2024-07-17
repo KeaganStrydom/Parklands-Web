@@ -9,65 +9,125 @@
 import UIKit
 import WebKit
 
-class ViewController: UIViewController {
-
-    var webView: WKWebView!
-    
-    var searchBar: UIView!
-    var searchField: UITextField!
-    
-    var backButton: UIBarButtonItem!
-    var forwardButton: UIBarButtonItem!
-    var homeButton: UIButton!
-    var reloadButton: UIButton!
-    
-    var darkOrange: UIColor = UIColor(red: 250/255, green: 192/255, blue: 46/255, alpha: 1)
-    
-    var progressBarView: UIView!
-    
-    var pageEditorSource: String!
-    
-    var blockedWords: [String]?
-    var blockedHosts: [String]?
-    
-    var requests: [()->()] = []
-    var requestsToComplete: Int = 0
-
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        
-        // Add requests to queue
-        requests = [getBlockedWords, getBlockedHosts]
-        requestsToComplete = requests.count
-        
-        // Execute requests
+class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSource{
+	
+	var webView: WKWebView!
+	var tableView: UITableView!
+	// var whitelistedSites: [String] = []
+	var urlToLoad: URL?
+	
+	//	var webView: WKWebView!
+	
+	var searchBar: UIView!
+	var searchField: UITextField!
+	
+	var backButton: UIBarButtonItem!
+	var forwardButton: UIBarButtonItem!
+	
+	var heartButton: UIButton!//--------------heart********
+	var whitelistedSites: [String] = []//--------------heart********
+	var isTableViewVisible = false
+	
+	var homeButton: UIButton!
+	var reloadButton: UIButton!
+	
+	var darkOrange: UIColor = UIColor(red: 250/255, green: 192/255, blue: 46/255, alpha: 1)
+	
+	var progressBarView: UIView!
+	
+	var pageEditorSource: String!
+	
+	var blockedWords: [String]?
+	var blockedHosts: [String]?
+	
+	var requests: [()->()] = []
+	var requestsToComplete: Int = 0
+	
+	override func viewDidLoad() {
+		super.viewDidLoad()
+		
+		// Add requests to queue
+		requests = [getBlockedWords, getBlockedHosts]
+		requestsToComplete = requests.count
+		
+		// Execute requests
 		let _ = requests.map { $0() }
 		
-        // Starting page
-        let myURL = URL(string: "http://www.kiddle.co")
-        let myRequest = URLRequest(url: myURL!)
-        webView.load(myRequest)
-        
-        setupNavigationBar()
-    }
-	
-    override func loadView() {
-        super.loadView()
+		// Starting page
+		let myURL = URL(string: "http://www.kiddle.co")
+		let myRequest = URLRequest(url: myURL!)
+		webView.load(myRequest)
 		
-        // Create WebView
-        webView = WKWebView(frame: .zero)
-        webView.uiDelegate = self
-        webView.navigationDelegate = self
-        webView.allowsBackForwardNavigationGestures = true
-        view = webView
-    }
+		setupNavigationBar()
+		
+		
+	}
+	
+	override func loadView() {
+		super.loadView()
+		
+		// Create WebView
+		webView = WKWebView(frame: .zero)
+		webView.uiDelegate = self
+		webView.navigationDelegate = self
+		webView.allowsBackForwardNavigationGestures = true
+		view = webView
+		
+		
+	}
+	
+	// Load whitelist from file
+	func loadWhitelist() {
+		if let path = Bundle.main.path(forResource: "whitelisted-sites", ofType: "txt") {
+			do {
+				let content = try String(contentsOfFile: path, encoding: .utf8)
+				whitelistedSites = content.components(separatedBy: .newlines).filter { !$0.isEmpty }
+			} catch {
+				print("Error loading whitelist: \(error)")
+			}
+		}
+	}
+	
+	// MARK: - TableView DataSource and Delegate Methods
+	
+	func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+		return whitelistedSites.count
+	}
+	
+	func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+		let cell = tableView.dequeueReusableCell(withIdentifier: "WhitelistCell", for: indexPath)
+		cell.textLabel?.text = whitelistedSites[indexPath.row]
+		cell.backgroundColor = UIColor(red: 1.0, green: 0.85, blue: 0.0, alpha: 1.0) // Dark orange color
+			  
+		return cell
+	}
+	
+	func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+		let selectedSite = whitelistedSites[indexPath.row]
+		if let url = URL(string: selectedSite) {
+			let request = URLRequest(url: url)
+			
+			webView.load(request)
+		}
+		// Hide the table view after selection
+		   tableView.isHidden = true
+		   
+		   // Optionally deselect the row (for better UX)
+		   tableView.deselectRow(at: indexPath, animated: true)
+		
+		
+		// Extend the web view to fullscreen
+		webView.frame = view.bounds
+	}
+	
+
 	
 	/* External resources */
 	
 	func getBlockedWords() {
 		/*
-		-    Fetch words to be censored
-		*/
+		 -    Fetch words to be censored
+		 */
 		let endpoint = URL(string: "https://cdn.rawgit.com/stephancill/Parklands-Web/38650c09/blocked-words.txt")
 		
 		URLSession.shared.dataTask(with: endpoint!) { (data, response, error) in
@@ -75,13 +135,13 @@ class ViewController: UIViewController {
 			let _ = words?.popLast()
 			self.blockedWords = words
 			self.asyncRequestComplete(error: error)
-			}.resume()
+		}.resume()
 	}
 	
 	func getBlockedHosts() {
 		/*
-		-    Fetch blocked hosts
-		*/
+		 -    Fetch blocked hosts
+		 */
 		let endpoint = URL(string: "https://cdn.rawgit.com/stephancill/Parklands-Web/38650c09/blocked-hosts.txt")
 		
 		URLSession.shared.dataTask(with: endpoint!) { (data, response, error) in
@@ -89,15 +149,15 @@ class ViewController: UIViewController {
 			let _ = hosts?.popLast()
 			self.blockedHosts = hosts
 			self.asyncRequestComplete(error: error)
-			}.resume()
+		}.resume()
 	}
 	
 	
 	
 	func asyncRequestComplete(error: Error?) {
 		/*
-		-    Handle complete request
-		*/
+		 -    Handle complete request
+		 */
 		if error != nil {  return }
 		requestsToComplete -= 1
 		print("Requests remaining: ", requestsToComplete)
@@ -116,8 +176,8 @@ class ViewController: UIViewController {
 	
 	func createPageEditorScript() -> String? {
 		/*
-		-    Populate the JS base script with external resources
-		*/
+		 -    Populate the JS base script with external resources
+		 */
 		guard let hosts = blockedHosts, let words = blockedWords else {
 			return nil
 		}
@@ -137,43 +197,46 @@ class ViewController: UIViewController {
 		}
 		return nil
 	}
-    
-    /* UI */
-    
-    override func viewWillLayoutSubviews() {
-        super.viewWillLayoutSubviews()
-        self.tearDownNavigationBar()
-        self.setupNavigationBar()
-    }
+	
+	/* UI */
+	
+	override func viewWillLayoutSubviews() {
+		super.viewWillLayoutSubviews()
+		self.tearDownNavigationBar()
+		self.setupNavigationBar()
+	}
+	
+	
+	
 	
 	/* Progress Bar */
-    func startProgressBar() {
-        progressBarView.backgroundColor = darkOrange
-        progressBarView.setWidth(0)
-        UIView.animate(withDuration: 2) {
-            self.progressBarView.setWidth(self.view.frame.width - 100)
-        }
-    }
-    
-    func completeProgressBar() {
-        UIView.animate(withDuration: 0.5) {
-            self.progressBarView.setWidth(self.view.frame.width)
-        }
-        
-        UIView.animate(withDuration: 0.5, animations: {
-            self.progressBarView.backgroundColor = .clear
-        }) { (bool) in
-            self.progressBarView.setWidth(0)
-        }
-    }
-    
-    func cancelProgressBar() {
-        UIView.animate(withDuration: 0.5, animations: {
-            self.progressBarView.backgroundColor = .clear
-        }) { (bool) in
-            self.progressBarView.setWidth(0)
-        }
-    }
+	func startProgressBar() {
+		progressBarView.backgroundColor = darkOrange
+		progressBarView.setWidth(0)
+		UIView.animate(withDuration: 2) {
+			self.progressBarView.setWidth(self.view.frame.width - 100)
+		}
+	}
+	
+	func completeProgressBar() {
+		UIView.animate(withDuration: 0.5) {
+			self.progressBarView.setWidth(self.view.frame.width)
+		}
+		
+		UIView.animate(withDuration: 0.5, animations: {
+			self.progressBarView.backgroundColor = .clear
+		}) { (bool) in
+			self.progressBarView.setWidth(0)
+		}
+	}
+	
+	func cancelProgressBar() {
+		UIView.animate(withDuration: 0.5, animations: {
+			self.progressBarView.backgroundColor = .clear
+		}) { (bool) in
+			self.progressBarView.setWidth(0)
+		}
+	}
 	
 	func setupNavigationBar() {
 		let bar = (self.navigationController?.navigationBar)!
@@ -208,14 +271,23 @@ class ViewController: UIViewController {
 		searchBar.addSubview(searchField)
 		
 		backButton = UIBarButtonItem(title: "Back", style: .plain, target: self, action: #selector(goBack))
-		backButton.tintColor = darkOrange
+		backButton.tintColor = .orange
 		backButton.isEnabled = false
 		self.navigationItem.setLeftBarButton(backButton, animated: true)
 		
 		forwardButton = UIBarButtonItem(title: "Forward", style: .plain, target: self, action: #selector(goForward))
-		forwardButton.tintColor = darkOrange
+		forwardButton.tintColor = .orange
 		forwardButton.isEnabled = false
 		self.navigationItem.setRightBarButton(forwardButton, animated: true)
+		//--------------HEART------------------------
+		// Create the heart-shaped button
+		heartButton = UIButton(frame: CGRect.init(x: 0, y: 0, width: searchBar.frame.height * 96/100-6, height: searchBar.frame.height * 96/100-6))
+		heartButton.frame.origin = CGPoint(x: searchBar.frame.minX - heartButton.frame.width - 45, y: searchBar.frame.height / 2 - heartButton.frame.height / 2 + 7)
+		heartButton.setImage(UIImage.init(named: "icn-heart"), for: .normal)
+		heartButton.backgroundColor = .clear
+		heartButton.addTarget(self, action: #selector(heartButtonTapped), for: .touchUpInside)
+		searchBar.addSubview(heartButton)
+		//----------------HEART----------------------
 		
 		homeButton = UIButton(frame: CGRect.init(x: 0, y: 0, width: searchBar.frame.height * 96/100, height: searchBar.frame.height * 96/100))
 		homeButton.frame.origin = CGPoint(x: searchBar.frame.minX - homeButton.frame.width - 12, y: searchBar.frame.height / 2 - homeButton.frame.height / 2 + 7)
@@ -236,17 +308,19 @@ class ViewController: UIViewController {
 		bar.backgroundColor = darkOrange
 		
 		// Add subviews
-		let _ = [searchBar, homeButton, reloadButton, progressBarView].map { bar.addSubview($0) }
+		let _ = [searchBar,heartButton, homeButton, reloadButton, progressBarView].map { bar.addSubview($0) }
 	}
 	
 	func tearDownNavigationBar() {
-		for view in [searchBar, homeButton, reloadButton, progressBarView] {
+		for view in [searchBar,heartButton, homeButton, reloadButton, progressBarView] {
 			view?.removeFromSuperview()
 		}
 	}
 }
 
-extension ViewController: WKUIDelegate, WKNavigationDelegate, WebViewTouchDelegate {
+extension ViewController: WKUIDelegate, WKNavigationDelegate, WebViewTouchDelegate{
+	
+	
 	/* WebKit */
 	@objc func goBack() {
 		webView.isUserInteractionEnabled = true
@@ -261,6 +335,51 @@ extension ViewController: WKUIDelegate, WKNavigationDelegate, WebViewTouchDelega
 		self.searchField.text = ""
 		self.webView.goHome()
 	}
+	@objc func heartButtonTapped() {
+		
+			
+			// Initialize the web view
+			webView = WKWebView(frame: CGRect(x: 0, y: 0, width: view.bounds.width, height: view.bounds.height * 0.05))
+			webView.navigationDelegate = self
+			view.addSubview(webView)
+			
+			// Load the URL if available
+			if let url = urlToLoad {
+				let request = URLRequest(url: url)
+				webView.load(request)
+			}
+			
+			// Load the whitelist from file
+			loadWhitelist()
+		if isTableViewVisible == false {
+			isTableViewVisible.toggle()
+			// Initialize the table view
+			tableView = UITableView(frame: CGRect(x: 0, y: webView.frame.maxY, width: view.bounds.width, height: view.bounds.height * 0.95), style: .plain)
+			tableView.delegate = self
+			tableView.dataSource = self
+			tableView.register(UITableViewCell.self, forCellReuseIdentifier: "WhitelistCell")
+			tableView.backgroundColor = .clear
+			
+			
+			view.addSubview(tableView)
+		} else {
+			isTableViewVisible.toggle()
+			tableView.isHidden = true
+			// Initialize the web view
+			webView = WKWebView(frame: CGRect(x: 0, y: 0, width: view.bounds.width, height: view.bounds.height * 0.00))
+			webView.navigationDelegate = self
+			view.addSubview(webView)
+			
+			// Load the URL if available
+			if let url = urlToLoad {
+				let request = URLRequest(url: url)
+				webView.load(request)
+			}
+		}
+	
+	
+	}
+	
 	
 	@objc func reload() {
 		self.webView.load(URLRequest.init(url: self.webView.url!))
@@ -332,6 +451,8 @@ extension ViewController: UITextFieldDelegate {
 		searchBar.layer.shadowOpacity = 0
 	}
 }
+
+
 
 enum ScriptCreationError: Error {
 	case creationFailure

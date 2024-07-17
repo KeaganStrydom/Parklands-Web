@@ -22,6 +22,8 @@ extension WKWebView {
 			load("http://m.kiddle.co/")
 		}
 	}
+    
+
 	
 	open override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
 		self.touchesBegan(touches, with: event)
@@ -29,7 +31,11 @@ extension WKWebView {
 			delegate.touchesBegan(webView: self)
 		}
 	}
+    
+    
 }
+
+
 
 protocol WebViewTouchDelegate {
 	func touchesBegan(webView: WKWebView)

@@ -14,6 +14,7 @@
 		D4E5FF1C1ECB4D9D0089F2E5 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D4E5FF1A1ECB4D9D0089F2E5 /* Main.storyboard */; };
 		D4E5FF1E1ECB4D9D0089F2E5 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D4E5FF1D1ECB4D9D0089F2E5 /* Assets.xcassets */; };
 		D4E5FF211ECB4D9D0089F2E5 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D4E5FF1F1ECB4D9D0089F2E5 /* LaunchScreen.storyboard */; };
+		E39E364E2C80A8780019D873 /* whitelisted-sites.txt in Resources */ = {isa = PBXBuildFile; fileRef = E39E364D2C80A8780019D873 /* whitelisted-sites.txt */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -26,6 +27,7 @@
 		D4E5FF1D1ECB4D9D0089F2E5 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		D4E5FF201ECB4D9D0089F2E5 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		D4E5FF221ECB4D9D0089F2E5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		E39E364D2C80A8780019D873 /* whitelisted-sites.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "whitelisted-sites.txt"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -62,6 +64,7 @@
 				D4E5FF181ECB4D9D0089F2E5 /* ViewController.swift */,
 				D40477091F52F55F000D1965 /* Extensions.swift */,
 				D4E5FF1A1ECB4D9D0089F2E5 /* Main.storyboard */,
+				E39E364D2C80A8780019D873 /* whitelisted-sites.txt */,
 				D4E5FF1D1ECB4D9D0089F2E5 /* Assets.xcassets */,
 				D4E5FF1F1ECB4D9D0089F2E5 /* LaunchScreen.storyboard */,
 				D4E5FF221ECB4D9D0089F2E5 /* Info.plist */,
@@ -103,6 +106,7 @@
 					D4E5FF121ECB4D9D0089F2E5 = {
 						CreatedOnToolsVersion = 8.3.1;
 						DevelopmentTeam = RX8VB86N8V;
+						LastSwiftMigration = 1540;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -131,6 +135,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E39E364E2C80A8780019D873 /* whitelisted-sites.txt in Resources */,
 				D4E5FF211ECB4D9D0089F2E5 /* LaunchScreen.storyboard in Resources */,
 				D4E5FF1E1ECB4D9D0089F2E5 /* Assets.xcassets in Resources */,
 				D459468E1EFF0A9500065692 /* page-editor.js in Resources */,
@@ -291,7 +296,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "parklands.co.za.Simple-Web";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 2;
 			};
 			name = Debug;
@@ -305,7 +310,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "parklands.co.za.Simple-Web";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 2;
 			};
 			name = Release;
